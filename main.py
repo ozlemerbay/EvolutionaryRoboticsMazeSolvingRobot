@@ -1,5 +1,8 @@
+from maze import Maze
+
 def main():
-    pass
+    maze = Maze()
+    maze.init(visualize=True)
 
 
 if __name__ == "__main__":
