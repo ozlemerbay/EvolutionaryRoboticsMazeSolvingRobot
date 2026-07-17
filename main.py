@@ -95,8 +95,8 @@ def train_neural_network(neural_network, controller_name):
         if gen < Config.GENERATIONS - 1:
             evolution.evolve(fitness_scores)
 
-        maze.close()
         p.removeBody(robot_id)
+        maze.close()
 
         print(f"gen {gen} | mean={gen_mean:.2f} | max={gen_max:.2f} | min={gen_min:.2f}")
 
