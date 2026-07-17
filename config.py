@@ -12,6 +12,7 @@ class Config:
     SENSOR_RANGE = 5.0
     TARGET_POSITION = [8.0, 0.0]
     SPEED_MULTIPLIER = 15.0
+    FITNESS_MULTIPLIER = 10.0
 
     # neural network parameters
     NUM_INPUTS = 5

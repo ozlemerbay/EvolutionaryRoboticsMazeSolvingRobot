@@ -39,7 +39,7 @@ def run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, st
     end_pos, _ = p.getBasePositionAndOrientation(robot_id)
     return start_pos, end_pos
 
-def calculate_fitness(start_pos, end_pos, target_position, fitness_multiplier=10):
+def calculate_fitness(start_pos, end_pos, target_position, fitness_multiplier):
     start_dist = math.dist([start_pos[0], start_pos[1]], [target_position[0], target_position[1]])
     end_dist = math.dist([end_pos[0], end_pos[1]], [target_position[0], target_position[1]])
 
@@ -81,7 +81,7 @@ def train_neural_network(neural_network, controller_name):
         fitness_scores = []
         for robot_genome in evolution.population:
             start_pos, end_pos = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
-            score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION)
+            score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, fitness_multiplier=Config.FITNESS_MULTIPLIER)
             fitness_scores.append(score)
 
         gen_mean = sum(fitness_scores) / len(fitness_scores)
