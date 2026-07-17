@@ -103,7 +103,7 @@ def train_neural_network(neural_network, controller_name):
     save_fitness_plot(mean_history, max_history, min_history, controller_name)
 
 def main():
-    controller_a = ControllerA(num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_MOTORS)
+    controller_a = ControllerA(num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
     train_neural_network(controller_a, "Controller A")
 
 if __name__ == "__main__":
