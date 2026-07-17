@@ -56,7 +56,6 @@ class Evolution:
             parent_2 = self._tournament_selection(population_with_scores, self.tournament_size)
             child = self._crossover(parent_1, parent_2)
             child = self._mutate(child)
-
             new_population.append(child)
 
         self.population = new_population

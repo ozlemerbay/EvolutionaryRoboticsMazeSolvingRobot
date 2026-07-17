@@ -4,7 +4,6 @@ import math
 
 class RobotInterface:
     def __init__(self, robot_id, sensor_range):
-        """init robot"""
         self.robot_id = robot_id
         self.sensor_range = sensor_range
         self.sensor_angles = [0, math.radians(45), math.radians(-45)]
