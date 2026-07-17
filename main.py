@@ -36,14 +36,22 @@ def run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, st
         robot.set_motor_velocities(left_speed * Config.SPEED_MULTIPLIER, right_speed * Config.SPEED_MULTIPLIER)
         p.stepSimulation()
 
+        # early stopping if it reaches the goal
+        if dist_to_target < 1.0:
+            break
+
     end_pos, _ = p.getBasePositionAndOrientation(robot_id)
     return start_pos, end_pos
 
-def calculate_fitness(start_pos, end_pos, target_position, fitness_multiplier):
+def calculate_fitness(start_pos, end_pos, target_position, fitness_multiplier=10):
     start_dist = math.dist([start_pos[0], start_pos[1]], [target_position[0], target_position[1]])
     end_dist = math.dist([end_pos[0], end_pos[1]], [target_position[0], target_position[1]])
 
     fitness = (start_dist - end_dist) * fitness_multiplier
+    # give a big bonus for reaching target
+    if end_dist < 1.0:
+        fitness += 1000.0
+
     return fitness
 
 def save_fitness_plot(mean_history, max_history, min_history, controller_name):
@@ -59,6 +67,18 @@ def save_fitness_plot(mean_history, max_history, min_history, controller_name):
     plt.savefig(plot_filename)
     plt.close()
 
+def save_success_plot(success_history, controller_name):
+    plt.figure()
+    plt.plot(success_history, label="reached target", color="purple", marker="o")
+    plt.title(f"{controller_name} Success Rate")
+    plt.xlabel("generation")
+    plt.ylabel("robots reached target")
+    plt.ylim(0, Config.POPULATION_SIZE)
+    plt.legend()
+    plot_filename = f"success_plot_{controller_name.replace(' ', '_').lower()}.png"
+    plt.savefig(plot_filename)
+    plt.close()
+
 def train_neural_network(neural_network, controller_name):
     evolution = Evolution(
         population_size=Config.POPULATION_SIZE,
@@ -69,7 +89,7 @@ def train_neural_network(neural_network, controller_name):
         elitism_count=Config.ELITISM_COUNT
     )
 
-    mean_history, max_history, min_history = [], [], []
+    mean_history, max_history, min_history, success_history = [], [], [], []
 
     for gen in range(Config.GENERATIONS):
         maze = Maze()
@@ -78,10 +98,14 @@ def train_neural_network(neural_network, controller_name):
         robot_id = p.loadURDF("robot.urdf", basePosition=[0, 0, 0.2])
         robot = RobotInterface(robot_id, sensor_range=Config.SENSOR_RANGE)
 
+        success_count = 0
         fitness_scores = []
         for robot_genome in evolution.population:
             start_pos, end_pos = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
             score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, fitness_multiplier=Config.FITNESS_MULTIPLIER)
+            end_dist = math.dist([end_pos[0], end_pos[1]], [Config.TARGET_POSITION[0], Config.TARGET_POSITION[1]])
+            if end_dist < 1.0:
+                success_count += 1
             fitness_scores.append(score)
 
         gen_mean = sum(fitness_scores) / len(fitness_scores)
@@ -91,6 +115,7 @@ def train_neural_network(neural_network, controller_name):
         mean_history.append(gen_mean)
         max_history.append(gen_max)
         min_history.append(gen_min)
+        success_history.append(success_count)
 
         if gen < Config.GENERATIONS - 1:
             evolution.evolve(fitness_scores)
@@ -98,9 +123,10 @@ def train_neural_network(neural_network, controller_name):
         p.removeBody(robot_id)
         maze.close()
 
-        print(f"gen {gen} | mean={gen_mean:.2f} | max={gen_max:.2f} | min={gen_min:.2f}")
+        print(f"gen {gen} | mean={gen_mean:.2f} | max={gen_max:.2f} | min={gen_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE}")
 
     save_fitness_plot(mean_history, max_history, min_history, controller_name)
+    save_success_plot(success_history, controller_name)
 
 def main():
     controller_a = ControllerA(num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
