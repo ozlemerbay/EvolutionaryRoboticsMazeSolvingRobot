@@ -27,7 +27,7 @@ class Maze:
         self._create_wall(-10, 0, wall_thick, 20, wall_height)
         self._create_wall(10, 0, wall_thick, 20, wall_height)
 
-        # grid is 5x5 see maze.png
+        # grid is 5x5 see maze_building_logic.png
         ROWS = 5
         COLS = 5
 
@@ -99,10 +99,10 @@ class Maze:
         p.createMultiBody(0, coll_id, vis_id, [x, y, height/2])
 
     def get_random_spawn_location(self):
-        """find a random spot where there is no wall"""
+        """find a random spot where there is no wall for robot to spawn"""
         while True:
             # spawn robot in the left side away from the target
-            random_x = random.uniform(-8.0, -8.0)
+            random_x = random.uniform(-9.0, -1.0)
             random_y = random.uniform(-8.0, 8.0)
 
             robot_size_box_min = [random_x - 0.3, random_y - 0.3, 0.1]
