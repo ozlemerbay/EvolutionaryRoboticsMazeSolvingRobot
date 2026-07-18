@@ -80,14 +80,14 @@ def save_success_plot(success_history, controller_name):
     plt.savefig(plot_filename)
     plt.close()
 
-def train_neural_network(neural_network, controller_name, verbose=True):
+def train_neural_network(neural_network, controller_name, verbose=True, mutation_rate=Config.MUTATION_RATE, crossover_rate=Config.CROSSOVER_RATE, tournament_size=Config.TOURNAMENT_SIZE, elitism_count=Config.ELITISM_COUNT):
     evolution = Evolution(
         population_size=Config.POPULATION_SIZE,
         num_genes=neural_network.total_genes,
-        mutation_rate=Config.MUTATION_RATE,
-        tournament_size=Config.TOURNAMENT_SIZE,
-        crossover_rate=Config.CROSSOVER_RATE,
-        elitism_count=Config.ELITISM_COUNT
+        mutation_rate=mutation_rate,
+        tournament_size=tournament_size,
+        crossover_rate=crossover_rate,
+        elitism_count=elitism_count
     )
 
     median_history, max_history, min_history, success_history = [], [], [], []
@@ -128,8 +128,7 @@ def train_neural_network(neural_network, controller_name, verbose=True):
         p.removeBody(robot_id)
         maze.close()
 
-        if verbose:
-            print(f"gen {gen} | median={gen_median:.2f} | max={gen_max:.2f} | min={gen_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE * Config.EVALUATION_TRIALS}")
+        print(f"gen {gen} | median={gen_median:.2f} | max={gen_max:.2f} | min={gen_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE * Config.EVALUATION_TRIALS}")
 
     if verbose:
         save_fitness_plot(median_history, max_history, min_history, controller_name)
