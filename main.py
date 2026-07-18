@@ -79,7 +79,7 @@ def save_success_plot(success_history, controller_name):
     plt.savefig(plot_filename)
     plt.close()
 
-def train_neural_network(neural_network, controller_name):
+def train_neural_network(neural_network, controller_name, verbose=True):
     evolution = Evolution(
         population_size=Config.POPULATION_SIZE,
         num_genes=neural_network.total_genes,
@@ -129,10 +129,14 @@ def train_neural_network(neural_network, controller_name):
         p.removeBody(robot_id)
         maze.close()
 
-        print(f"gen {gen} | mean={gen_mean:.2f} | max={gen_max:.2f} | min={gen_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE * Config.EVALUATION_TRIALS}")
+        if verbose:
+            print(f"gen {gen} | mean={gen_mean:.2f} | max={gen_max:.2f} | min={gen_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE * Config.EVALUATION_TRIALS}")
 
-    save_fitness_plot(mean_history, max_history, min_history, controller_name)
-    save_success_plot(success_history, controller_name)
+    if verbose:
+        save_fitness_plot(mean_history, max_history, min_history, controller_name)
+        save_success_plot(success_history, controller_name)
+
+    return max_history[-1], success_history[-1]
 
 def main():
     controller_a = ControllerA(num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
