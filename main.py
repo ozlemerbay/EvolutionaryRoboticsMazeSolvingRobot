@@ -73,7 +73,7 @@ def save_success_plot(success_history, controller_name):
     plt.title(f"{controller_name} Success Rate")
     plt.xlabel("generation")
     plt.ylabel("robots reached target")
-    plt.ylim(0, Config.POPULATION_SIZE)
+    plt.ylim(0, Config.POPULATION_SIZE * Config.EVALUATION_TRIALS)
     plt.legend()
     plot_filename = f"success_plot_{controller_name.replace(' ', '_').lower()}.png"
     plt.savefig(plot_filename)
@@ -101,12 +101,18 @@ def train_neural_network(neural_network, controller_name):
         success_count = 0
         fitness_scores = []
         for robot_genome in evolution.population:
-            start_pos, end_pos = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
-            score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, fitness_multiplier=Config.FITNESS_MULTIPLIER)
-            end_dist = math.dist([end_pos[0], end_pos[1]], [Config.TARGET_POSITION[0], Config.TARGET_POSITION[1]])
-            if end_dist < 1.0:
-                success_count += 1
-            fitness_scores.append(score)
+            genome_score = 0
+            for _ in range(Config.EVALUATION_TRIALS):
+                start_pos, end_pos = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
+                score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, fitness_multiplier=Config.FITNESS_MULTIPLIER)
+
+                end_dist = math.dist([end_pos[0], end_pos[1]], [Config.TARGET_POSITION[0], Config.TARGET_POSITION[1]])
+                if end_dist < 1.0:
+                    success_count += 1
+
+                genome_score += score
+
+            fitness_scores.append(genome_score / Config.EVALUATION_TRIALS)
 
         gen_mean = sum(fitness_scores) / len(fitness_scores)
         gen_max = max(fitness_scores)
@@ -123,7 +129,7 @@ def train_neural_network(neural_network, controller_name):
         p.removeBody(robot_id)
         maze.close()
 
-        print(f"gen {gen} | mean={gen_mean:.2f} | max={gen_max:.2f} | min={gen_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE}")
+        print(f"gen {gen} | mean={gen_mean:.2f} | max={gen_max:.2f} | min={gen_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE * Config.EVALUATION_TRIALS}")
 
     save_fitness_plot(mean_history, max_history, min_history, controller_name)
     save_success_plot(success_history, controller_name)
