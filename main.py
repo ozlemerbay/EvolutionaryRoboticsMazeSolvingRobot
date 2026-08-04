@@ -15,7 +15,10 @@ def run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, st
     p.resetBasePositionAndOrientation(robot_id, start_pos, p.getQuaternionFromEuler([0, 0, angle]))
 
     neural_network.set_weights(robot_genome)
+    steps_taken = 0
+    collisions = 0
     for _ in range(steps):
+        steps_taken += 1
         sensors = robot.get_sensor_data()
         current_position, orientation = p.getBasePositionAndOrientation(robot_id)
         distance_x = target_position[0] - current_position[0]
@@ -37,18 +40,28 @@ def run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, st
         robot.set_motor_velocities(left_speed * Config.SPEED_MULTIPLIER, right_speed * Config.SPEED_MULTIPLIER)
         p.stepSimulation()
 
+        # check for collisions
+        contact_points = p.getContactPoints(bodyA=robot_id)
+        for contact in contact_points:
+            if contact[2] != maze.planeId: # if not floor
+                collisions += 1
+                break
+
         # early stopping if it reaches the goal
         if dist_to_target < 1.0:
             break
 
     end_pos, _ = p.getBasePositionAndOrientation(robot_id)
-    return start_pos, end_pos
+    return start_pos, end_pos, steps_taken, collisions
 
-def calculate_fitness(start_pos, end_pos, target_position, fitness_multiplier=10):
+def calculate_fitness(start_pos, end_pos, target_position, steps_taken, collisions, fitness_multiplier=10):
     start_dist = math.dist([start_pos[0], start_pos[1]], [target_position[0], target_position[1]])
     end_dist = math.dist([end_pos[0], end_pos[1]], [target_position[0], target_position[1]])
 
     fitness = (start_dist - end_dist) * fitness_multiplier
+    fitness -= collisions * 5.0
+    fitness -= steps_taken * 0.05
+
     # give a big bonus for reaching target
     if end_dist < 1.0:
         fitness += 1000.0
@@ -104,8 +117,8 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
         for robot_genome in evolution.population:
             genome_score = 0
             for _ in range(Config.EVALUATION_TRIALS):
-                start_pos, end_pos = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
-                score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, fitness_multiplier=Config.FITNESS_MULTIPLIER)
+                start_pos, end_pos, steps_taken, collisions = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
+                score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, steps_taken=steps_taken, collisions=collisions, fitness_multiplier=Config.FITNESS_MULTIPLIER)
                 end_dist = math.dist([end_pos[0], end_pos[1]], [Config.TARGET_POSITION[0], Config.TARGET_POSITION[1]])
                 if end_dist < 1.0:
                     success_count += 1
