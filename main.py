@@ -59,8 +59,8 @@ def calculate_fitness(start_pos, end_pos, target_position, steps_taken, collisio
     end_dist = math.dist([end_pos[0], end_pos[1]], [target_position[0], target_position[1]])
 
     fitness = (start_dist - end_dist) * fitness_multiplier
-    fitness -= collisions * 5.0
-    fitness -= steps_taken * 0.05
+    fitness -= collisions * 0.1
+    fitness -= steps_taken * 0.01
 
     # give a big bonus for reaching target
     if end_dist < 1.0:
