@@ -10,7 +10,7 @@ class Config:
     # simulation parameters
     SIMULATION_STEPS = 10000
     SENSOR_RANGE = 5.0
-    TARGET_POSITION = [8.0, 0.0]
+    TARGET_POSITION = [0.0, 9.5]
     SPEED_MULTIPLIER = 15.0
     FITNESS_MULTIPLIER = 10.0
     EVALUATION_TRIALS = 3

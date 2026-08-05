@@ -105,13 +105,13 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
 
     median_history, max_history, min_history, success_history = [], [], [], []
 
+    maze = Maze()
+    maze.init(visualize=False)
+
+    robot_id = p.loadURDF("robot.urdf", basePosition=[0, 0, 0.2])
+    robot = RobotInterface(robot_id, sensor_range=Config.SENSOR_RANGE)
+
     for gen in range(Config.GENERATIONS):
-        maze = Maze()
-        maze.init(visualize=False)
-
-        robot_id = p.loadURDF("robot.urdf", basePosition=[0, 0, 0.2])
-        robot = RobotInterface(robot_id, sensor_range=Config.SENSOR_RANGE)
-
         success_count = 0
         fitness_scores = []
         for robot_genome in evolution.population:
@@ -138,11 +138,11 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
         if gen < Config.GENERATIONS - 1:
             evolution.evolve(fitness_scores)
 
-        p.removeBody(robot_id)
-        maze.close()
-
         print(f"gen {gen} | median={gen_median:.2f} | max={gen_max:.2f} | min={gen_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE * Config.EVALUATION_TRIALS}")
 
+    p.removeBody(robot_id)
+    maze.close()
+    
     if verbose:
         save_fitness_plot(median_history, max_history, min_history, controller_name)
         save_success_plot(success_history, controller_name)
