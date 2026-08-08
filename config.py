@@ -18,3 +18,4 @@ class Config:
     # neural network parameters
     NUM_INPUTS = 5
     NUM_OUTPUTS = 2
+    HIDDEN_NODES = 5
