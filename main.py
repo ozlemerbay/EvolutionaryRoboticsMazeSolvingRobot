@@ -55,15 +55,15 @@ def run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, st
     return start_pos, end_pos, steps_taken, collisions
 
 def calculate_fitness(start_pos, end_pos, target_position, steps_taken, collisions, fitness_multiplier=10):
-    start_dist = math.dist([start_pos[0], start_pos[1]], [target_position[0], target_position[1]])
-    end_dist = math.dist([end_pos[0], end_pos[1]], [target_position[0], target_position[1]])
+    dist_needs_to_be_taken = math.dist([start_pos[0], start_pos[1]], [target_position[0], target_position[1]])
+    dist_left_to_target = math.dist([end_pos[0], end_pos[1]], [target_position[0], target_position[1]])
 
-    fitness = (start_dist - end_dist) * fitness_multiplier
+    fitness = (dist_needs_to_be_taken - dist_left_to_target) * fitness_multiplier
     fitness -= collisions * 0.1
     fitness -= steps_taken * 0.01
 
     # give a big bonus for reaching target
-    if end_dist < 1.0:
+    if dist_left_to_target < 1.0:
         fitness += 1000.0
 
     return fitness
@@ -96,7 +96,7 @@ def save_success_plot(success_history, controller_name):
 def train_neural_network(neural_network, controller_name, verbose=True, mutation_rate=Config.MUTATION_RATE, crossover_rate=Config.CROSSOVER_RATE, tournament_size=Config.TOURNAMENT_SIZE, elitism_count=Config.ELITISM_COUNT):
     evolution = Evolution(
         population_size=Config.POPULATION_SIZE,
-        num_genes=neural_network.total_genes,
+        genome_len=neural_network.total_genes,
         mutation_rate=mutation_rate,
         tournament_size=tournament_size,
         crossover_rate=crossover_rate,
@@ -111,38 +111,39 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
     robot_id = p.loadURDF("robot.urdf", basePosition=[0, 0, 0.2])
     robot = RobotInterface(robot_id, sensor_range=Config.SENSOR_RANGE)
 
-    for gen in range(Config.GENERATIONS):
+    for generation in range(Config.GENERATIONS):
         success_count = 0
         fitness_scores = []
         for robot_genome in evolution.population:
-            genome_score = 0
+            genome_fitness_score = 0
             for _ in range(Config.EVALUATION_TRIALS):
                 start_pos, end_pos, steps_taken, collisions = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
                 score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, steps_taken=steps_taken, collisions=collisions, fitness_multiplier=Config.FITNESS_MULTIPLIER)
-                end_dist = math.dist([end_pos[0], end_pos[1]], [Config.TARGET_POSITION[0], Config.TARGET_POSITION[1]])
-                if end_dist < 1.0:
+                dist_left_to_target = math.dist([end_pos[0], end_pos[1]], [Config.TARGET_POSITION[0], Config.TARGET_POSITION[1]])
+                # if it reached the target
+                if dist_left_to_target < 1.0:
                     success_count += 1
-                genome_score += score
+                genome_fitness_score += score
 
-            fitness_scores.append(genome_score / Config.EVALUATION_TRIALS)
+            fitness_scores.append(genome_fitness_score / Config.EVALUATION_TRIALS)
 
-        gen_median = statistics.median(fitness_scores)
-        gen_max = max(fitness_scores)
-        gen_min = min(fitness_scores)
+        genome_fitness_score_median = statistics.median(fitness_scores)
+        genome_fitness_score_max = max(fitness_scores)
+        genome_fitness_score_min = min(fitness_scores)
 
-        median_history.append(gen_median)
-        max_history.append(gen_max)
-        min_history.append(gen_min)
+        median_history.append(genome_fitness_score_median)
+        max_history.append(genome_fitness_score_max)
+        min_history.append(genome_fitness_score_min)
         success_history.append(success_count)
 
-        if gen < Config.GENERATIONS - 1:
+        if generation < Config.GENERATIONS - 1:
             evolution.evolve(fitness_scores)
 
-        print(f"gen {gen} | median={gen_median:.2f} | max={gen_max:.2f} | min={gen_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE * Config.EVALUATION_TRIALS}")
+        print(f"gen {generation} | median={genome_fitness_score_median:.2f} | max={genome_fitness_score_max:.2f} | min={genome_fitness_score_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE * Config.EVALUATION_TRIALS}")
 
     p.removeBody(robot_id)
     maze.close()
-    
+
     if verbose:
         save_fitness_plot(median_history, max_history, min_history, controller_name)
         save_success_plot(success_history, controller_name)

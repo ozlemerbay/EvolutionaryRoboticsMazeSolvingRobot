@@ -1,9 +1,9 @@
 import random
 import numpy as np
 class Evolution:
-    def __init__(self, population_size, num_genes, mutation_rate, tournament_size, crossover_rate, elitism_count=1):
+    def __init__(self, population_size, genome_len, mutation_rate, tournament_size, crossover_rate, elitism_count):
         self.population_size = population_size
-        self.num_genes = num_genes
+        self.genome_len = genome_len
         self.mutation_rate = mutation_rate
         self.tournament_size = tournament_size
         self.crossover_rate = crossover_rate
@@ -12,32 +12,31 @@ class Evolution:
 
         # create random population
         for _ in range(population_size):
-            genome = np.random.uniform(-1.0, 1.0, num_genes)
+            genome = np.random.uniform(-1.0, 1.0, genome_len)
             self.population.append(genome)
 
     def _tournament_selection(self, population_with_scores, tournament_size):
-        """return the random robot genome """
+        """return the best individual from the random selected group of population"""
         tournament = random.sample(population_with_scores, tournament_size)
         tournament.sort(key=lambda x: x[1], reverse=True)
         return tournament[0][0]
 
     def _crossover(self, parent1, parent2):
         """apply uniform crossover"""
-        if random.random() > self.crossover_rate:
+        if random.random() < self.crossover_rate:
+            child = np.zeros(self.genome_len)
+            for i in range(self.genome_len):
+                if random.random() < 0.5:
+                    child[i] = parent1[i]
+                else:
+                    child[i] = parent2[i]
+            return child
+        else:
             return parent1.copy()
-
-        child = np.zeros(self.num_genes)
-        for i in range(self.num_genes):
-            if random.random() < 0.5:
-                child[i] = parent1[i]
-            else:
-                child[i] = parent2[i]
-
-        return child
 
     def _mutate(self, genome):
         """apply uniform mutation"""
-        for i in range(self.num_genes):
+        for i in range(self.genome_len):
             if random.random() < self.mutation_rate:
                 genome[i] += random.uniform(-0.5, 0.5)
         return genome

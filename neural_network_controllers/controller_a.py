@@ -8,7 +8,7 @@ class ControllerA:
 
         self.weights = np.zeros((self.num_inputs, self.num_outputs))
         self.biases = np.zeros(self.num_outputs)
-        self.total_genes = (self.num_inputs * self.num_outputs) + self.num_outputs
+        self.genome = (self.num_inputs * self.num_outputs) + self.num_outputs
 
     def set_weights(self, genome):
         bias_start_idx = self.num_inputs * self.num_outputs
