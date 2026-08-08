@@ -38,7 +38,7 @@ class Evolution:
         """apply uniform mutation"""
         for i in range(self.genome_len):
             if random.random() < self.mutation_rate:
-                genome[i] += random.uniform(-0.5, 0.5)
+                genome[i] += random.uniform(-0.1, 0.1)
         return genome
 
     def evolve(self, fitness_scores):
