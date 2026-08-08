@@ -93,7 +93,7 @@ def save_success_plot(success_history, controller_name):
     plt.savefig(plot_filename)
     plt.close()
 
-def train_neural_network(neural_network, controller_name, verbose=True, mutation_rate=Config.MUTATION_RATE, crossover_rate=Config.CROSSOVER_RATE, tournament_size=Config.TOURNAMENT_SIZE, elitism_count=Config.ELITISM_COUNT):
+def train_neural_network(neural_network, controller_name, verbose=True, mutation_rate=Config.MUTATION_RATE, crossover_rate=Config.CROSSOVER_RATE, tournament_size=Config.TOURNAMENT_SIZE, elitism_count=Config.ELITISM_COUNT, evaluation_trials=Config.EVALUATION_TRIALS):
     evolution = Evolution(
         population_size=Config.POPULATION_SIZE,
         genome_len=neural_network.genome_len,
@@ -116,7 +116,7 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
         fitness_scores = []
         for robot_genome in evolution.population:
             genome_fitness_score = 0
-            for _ in range(Config.EVALUATION_TRIALS):
+            for _ in range(evaluation_trials):
                 start_pos, end_pos, steps_taken, collisions = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
                 score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, steps_taken=steps_taken, collisions=collisions, fitness_multiplier=Config.FITNESS_MULTIPLIER)
                 dist_left_to_target = math.dist([end_pos[0], end_pos[1]], [Config.TARGET_POSITION[0], Config.TARGET_POSITION[1]])

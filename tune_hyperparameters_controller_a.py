@@ -21,7 +21,8 @@ def main():
                         mutation_rate=m_rate,
                         crossover_rate=c_rate,
                         tournament_size=t_size,
-                        elitism_count=e_count
+                        elitism_count=e_count,
+                        evaluation_trials=1
                     )
                     results.append({
                         'mutation': m_rate,
