@@ -96,7 +96,7 @@ def save_success_plot(success_history, controller_name):
 def train_neural_network(neural_network, controller_name, verbose=True, mutation_rate=Config.MUTATION_RATE, crossover_rate=Config.CROSSOVER_RATE, tournament_size=Config.TOURNAMENT_SIZE, elitism_count=Config.ELITISM_COUNT):
     evolution = Evolution(
         population_size=Config.POPULATION_SIZE,
-        genome_len=neural_network.total_genes,
+        genome_len=neural_network.genome_len,
         mutation_rate=mutation_rate,
         tournament_size=tournament_size,
         crossover_rate=crossover_rate,
