@@ -24,13 +24,15 @@ def run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, st
         distance_x = target_position[0] - current_position[0]
         distance_y = target_position[1] - current_position[1]
         dist_to_target = math.dist([current_position[0], current_position[1]], [target_position[0], target_position[1]])
+        normalized_dist = min(dist_to_target / 30.0, 1.0)
 
         target_angle = math.atan2(distance_y, distance_x)
         _, _, current_angle = p.getEulerFromQuaternion(orientation)
         angle_to_target = target_angle - current_angle
         angle_to_target = (angle_to_target + math.pi) % (2 * math.pi) - math.pi # normalise the angle
+        normalized_angle = angle_to_target / math.pi
 
-        sensors.extend([dist_to_target, angle_to_target])
+        sensors.extend([normalized_dist, normalized_angle])
         left_speed, right_speed = neural_network.forward(sensors)
 
         # move robot
