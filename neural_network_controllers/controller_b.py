@@ -1,5 +1,4 @@
 import numpy as np
-from config import Config
 
 class ControllerB:
     """feedforward nn with multiple hidden layers"""
