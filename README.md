@@ -26,3 +26,8 @@ I have created test_maze.py file to see the maze and the robot 3D:
 ```bash
 uv run test_maze.py
 ```
+
+## Run trainings
+```bash
+uv run main.py | tee results.txt
+```

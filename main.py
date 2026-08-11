@@ -3,11 +3,15 @@ from maze import Maze
 from robot_interface import RobotInterface
 from evolution import Evolution
 from config import Config
-from neural_network_controllers import ControllerA
+from neural_network_controllers import ControllerA, ControllerB, ControllerC
 import matplotlib.pyplot as plt
 import math
 import statistics
+import random
+import numpy as np
 
+# my student id
+RANDOM_SEED = 821836
 
 def run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps, target_position):
     # spawn robot to a random location
@@ -153,8 +157,16 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
     return max_history[-1], success_history[-1]
 
 def main():
+    print(f"Student number as random seed: {RANDOM_SEED}")
+    random.seed(RANDOM_SEED)
+    np.random.seed(RANDOM_SEED)
+
     controller_a = ControllerA(num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
-    train_neural_network(controller_a, "Controller A")
+    train_neural_network(controller_a, "Controller A", verbose=True,mutation_rate=0.2, crossover_rate=0.9, tournament_size=5, elitism_count=2)
+    controller_b = ControllerB(hidden_layers=2, hidden_nodes=10, num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
+    train_neural_network(controller_b, "Controller B", verbose=True, mutation_rate=0.2, crossover_rate= 0.7, tournament_size=2, elitism_count=1)
+    controller_c = ControllerC(hidden_nodes=10 ,num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
+    train_neural_network(controller_c, "Controller C", mutation_rate=0.2, crossover_rate=0.9, tournament_size=3, elitism_count=2)
 
 if __name__ == "__main__":
     main()
