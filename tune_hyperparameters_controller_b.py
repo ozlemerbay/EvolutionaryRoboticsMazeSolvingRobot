@@ -34,7 +34,7 @@ def main():
 
     all_possible_configs = []
     for hidden_layer in hidden_layers:
-        for hidden_node in hidden_nodes:
+        for hidden_node in hidden_nodes_options:
             for t_size in tournament_sizes:
                 for e_count in elitism_counts:
                     for m_rate in mutation_rates:
