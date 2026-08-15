@@ -87,19 +87,19 @@ def save_fitness_plot(median_history, max_history, min_history, controller_name)
     plt.savefig(plot_filename)
     plt.close()
 
-def save_success_plot(success_history, controller_name):
+def save_success_plot(success_history, controller_name, max_successes):
     plt.figure()
     plt.plot(success_history, label="reached target", color="purple", marker="o")
     plt.title(f"{controller_name} Success Rate")
     plt.xlabel("generation")
     plt.ylabel("robots reached target")
-    plt.ylim(0, Config.POPULATION_SIZE * Config.EVALUATION_TRIALS)
+    plt.ylim(0, max_successes)
     plt.legend()
     plot_filename = f"success_plot_{controller_name.replace(' ', '_').lower()}.png"
     plt.savefig(plot_filename)
     plt.close()
 
-def train_neural_network(neural_network, controller_name, verbose=True, mutation_rate=Config.MUTATION_RATE, crossover_rate=Config.CROSSOVER_RATE, tournament_size=Config.TOURNAMENT_SIZE, elitism_count=Config.ELITISM_COUNT, evaluation_trials=Config.EVALUATION_TRIALS):
+def train_neural_network(neural_network, controller_name, verbose=True, mutation_rate=Config.MUTATION_RATE, crossover_rate=Config.CROSSOVER_RATE, tournament_size=Config.TOURNAMENT_SIZE, elitism_count=Config.ELITISM_COUNT):
     evolution = Evolution(
         population_size=Config.POPULATION_SIZE,
         genome_len=neural_network.genome_len,
@@ -121,17 +121,14 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
         success_count = 0
         fitness_scores = []
         for robot_genome in evolution.population:
-            genome_fitness_score = 0
-            for _ in range(evaluation_trials):
-                start_pos, end_pos, steps_taken, collisions = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
-                score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, steps_taken=steps_taken, collisions=collisions, fitness_multiplier=Config.FITNESS_MULTIPLIER)
-                dist_left_to_target = math.dist([end_pos[0], end_pos[1]], [Config.TARGET_POSITION[0], Config.TARGET_POSITION[1]])
-                # if it reached the target
-                if dist_left_to_target < 1.0:
-                    success_count += 1
-                genome_fitness_score += score
+            start_pos, end_pos, steps_taken, collisions = run_robot_simulation(maze, robot, robot_id, neural_network, robot_genome, steps=Config.SIMULATION_STEPS, target_position=Config.TARGET_POSITION)
+            score = calculate_fitness(start_pos, end_pos, target_position=Config.TARGET_POSITION, steps_taken=steps_taken, collisions=collisions, fitness_multiplier=Config.FITNESS_MULTIPLIER)
+            dist_left_to_target = math.dist([end_pos[0], end_pos[1]], [Config.TARGET_POSITION[0], Config.TARGET_POSITION[1]])
+            # if it reached the target
+            if dist_left_to_target < 1.0:
+                success_count += 1
 
-            fitness_scores.append(genome_fitness_score / Config.EVALUATION_TRIALS)
+            fitness_scores.append(score)
 
         genome_fitness_score_median = statistics.median(fitness_scores)
         genome_fitness_score_max = max(fitness_scores)
@@ -145,14 +142,14 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
         if generation < Config.GENERATIONS - 1:
             evolution.evolve(fitness_scores)
 
-        print(f"gen {generation} | median={genome_fitness_score_median:.2f} | max={genome_fitness_score_max:.2f} | min={genome_fitness_score_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE * Config.EVALUATION_TRIALS}")
+        print(f"gen {generation} | median={genome_fitness_score_median:.2f} | max={genome_fitness_score_max:.2f} | min={genome_fitness_score_min:.2f} | reached target: {success_count}/{Config.POPULATION_SIZE}")
 
     p.removeBody(robot_id)
     maze.close()
 
     if verbose:
         save_fitness_plot(median_history, max_history, min_history, controller_name)
-        save_success_plot(success_history, controller_name)
+        save_success_plot(success_history, controller_name, Config.POPULATION_SIZE)
 
     return max_history[-1], success_history[-1]
 

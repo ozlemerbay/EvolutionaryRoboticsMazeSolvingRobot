@@ -17,8 +17,7 @@ def hypertuning_config(current_config):
         mutation_rate=current_config['mutation'],
         crossover_rate=current_config['crossover'],
         tournament_size=current_config['tournament'],
-        elitism_count=current_config['elitism'],
-        evaluation_trials=1,
+        elitism_count=current_config['elitism']
     )
     current_config['max_fitness'] = max_fitness
     current_config['success'] = success_count

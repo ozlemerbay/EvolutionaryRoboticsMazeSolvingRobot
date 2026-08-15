@@ -13,7 +13,6 @@ class Config:
     TARGET_POSITION = [0.0, 9.5]
     SPEED_MULTIPLIER = 15.0
     FITNESS_MULTIPLIER = 10.0
-    EVALUATION_TRIALS = 3
 
     # neural network parameters
     NUM_INPUTS = 5
