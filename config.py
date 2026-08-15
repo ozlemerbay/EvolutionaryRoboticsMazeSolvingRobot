@@ -1,7 +1,7 @@
 class Config:
     # evolution hyperparameters
     POPULATION_SIZE = 50
-    GENERATIONS = 50
+    GENERATIONS = 200
     MUTATION_RATE = 0.1
     CROSSOVER_RATE = 0.7
     TOURNAMENT_SIZE = 3
