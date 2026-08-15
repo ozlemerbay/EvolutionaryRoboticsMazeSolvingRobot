@@ -159,11 +159,11 @@ def main():
     np.random.seed(RANDOM_SEED)
 
     controller_a = ControllerA(num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
-    train_neural_network(controller_a, "Controller A", verbose=True,mutation_rate=0.2, crossover_rate=0.9, tournament_size=5, elitism_count=2)
-    controller_b = ControllerB(hidden_layers=2, hidden_nodes=10, num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
-    train_neural_network(controller_b, "Controller B", verbose=True, mutation_rate=0.2, crossover_rate= 0.7, tournament_size=2, elitism_count=1)
-    controller_c = ControllerC(hidden_nodes=10 ,num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
-    train_neural_network(controller_c, "Controller C", mutation_rate=0.2, crossover_rate=0.9, tournament_size=3, elitism_count=2)
+    train_neural_network(controller_a, "Controller A", verbose=True, mutation_rate=0.05, crossover_rate=0.7, tournament_size=2, elitism_count=1)
+    controller_b = ControllerB(hidden_layers=3, hidden_nodes=15, num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
+    train_neural_network(controller_b, "Controller B", verbose=True, mutation_rate=0.2, crossover_rate=0.5, tournament_size=5, elitism_count=2)
+    controller_c = ControllerC(hidden_nodes=5, num_inputs=Config.NUM_INPUTS, num_outputs=Config.NUM_OUTPUTS)
+    train_neural_network(controller_c, "Controller C", verbose=True, mutation_rate=0.05, crossover_rate=0.7, tournament_size=5, elitism_count=2)
 
 if __name__ == "__main__":
     main()
