@@ -43,7 +43,7 @@ def main():
                             'elitism': e_count,
                         })
 
-    num_workers = os.cpu_count()
+    num_workers = max(1, os.cpu_count() - 2)
     results = []
     with ProcessPoolExecutor(max_workers=num_workers) as executer:
         futures = {executer.submit(hypertuning_config, current_config): current_config for current_config in all_possible_configs}

@@ -33,7 +33,7 @@ def main():
 
     all_possible_configs = []
     for hidden_layer in hidden_layers:
-        for hidden_node in hidden_nodes_options:
+        for hidden_node in hidden_nodes:
             for t_size in tournament_sizes:
                 for e_count in elitism_counts:
                     for m_rate in mutation_rates:
@@ -48,7 +48,7 @@ def main():
 
                         })
 
-    num_workers = os.cpu_count()
+    num_workers = max(1, os.cpu_count() - 2)
     results = []
     with ProcessPoolExecutor(max_workers=num_workers) as executer:
         futures = {executer.submit(hypertuning_config, current_config): current_config for current_config in all_possible_configs}
