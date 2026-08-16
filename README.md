@@ -1,4 +1,5 @@
-# evorob-miniproj2
+# Evolutionary Robotics - Autonomous Maze Navigation
+**Student Number (Problem ID / Seed): 821836**
 
 ## Hyperparameter Tuning
 I have created hyperparameter tuning files for each controller since they have different structures.
@@ -28,6 +29,7 @@ uv run test_maze.py
 ```
 
 ## Run trainings
+To run the full evolutionary training for all three controllers, reproduce the results, and automatically generate all the fitness and success .png plots, run the following command:
 ```bash
 uv run main.py | tee results.txt
 ```
