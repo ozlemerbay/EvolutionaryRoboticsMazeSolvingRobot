@@ -43,10 +43,11 @@ class Maze:
 
     def get_random_spawn_location(self):
         """find a random spot where there is no wall for robot to spawn"""
+        true_random = random.SystemRandom() # do not use seed so that it would be really random
         while True:
             # spawn robot randomly inside the maze
-            random_x = random.uniform(-17.0, 17.0)
-            random_y = random.uniform(-8.0, 8.0)
+            random_x = true_random.uniform(-17.0, 17.0)
+            random_y = true_random.uniform(-8.0, 8.0)
 
             robot_size_box_min = [random_x - 1.2, random_y - 1.2, 0.1]
             robot_size_box_max = [random_x + 1.2, random_y + 1.2, 0.5]
@@ -63,7 +64,7 @@ class Maze:
             if is_safe:
                 break
         # pick random angle
-        random_angle = random.uniform(0, 2 * math.pi)
+        random_angle = true_random.uniform(0, 2 * math.pi)
         return [random_x, random_y, 0.2], random_angle
 
     def close(self):
