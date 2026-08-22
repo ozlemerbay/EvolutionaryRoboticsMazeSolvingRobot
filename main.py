@@ -110,6 +110,8 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
     )
 
     median_history, max_history, min_history, success_history = [], [], [], []
+    best_genome_overall = None
+    best_fitness_overall = -float('inf')
 
     maze = Maze()
     maze.init(visualize=False)
@@ -127,6 +129,10 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
             # if it reached the target
             if dist_left_to_target < 1.0:
                 success_count += 1
+
+            if score > best_fitness_overall:
+                best_fitness_overall = score
+                best_genome_overall = robot_genome.copy()
 
             fitness_scores.append(score)
 
@@ -150,6 +156,7 @@ def train_neural_network(neural_network, controller_name, verbose=True, mutation
     if verbose:
         save_fitness_plot(median_history, max_history, min_history, controller_name)
         save_success_plot(success_history, controller_name, Config.POPULATION_SIZE)
+        np.save(f"best_genome_{controller_name.replace(' ', '_').lower()}.npy", best_genome_overall)
 
     return max_history[-1], success_history[-1]
 
