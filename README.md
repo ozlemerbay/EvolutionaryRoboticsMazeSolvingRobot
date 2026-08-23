@@ -21,15 +21,15 @@ For controller_c:
 uv run tune_hyperparameters_controller_c.py | tee tuned_hyperparameters_controller_c.txt
 ```
 
-## Control Environment in 3D
-
-I have created test_maze.py file to see the maze and the robot 3D:
-```bash
-uv run test_maze.py
-```
-
 ## Run trainings
 To run the full evolutionary training for all three controllers, reproduce the results, and automatically generate all the fitness and success .png plots, run the following command:
 ```bash
 uv run main.py | tee results.txt
+```
+
+## Showcasing Trained Models
+Best performing weights for each controller are saved into `.npy` files. These files (`best_genome_controller_a.npy`, `best_genome_controller_b.npy`, and `best_genome_controller_c.npy`).
+I have created the `deploy_models.py` file to demonstrate how the trained models work. This script loads the saved `.npy` models and show how they solve the maze. To see it run the following command:
+```bash
+uv run deploy_models.py
 ```
