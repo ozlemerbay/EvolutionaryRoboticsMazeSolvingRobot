@@ -1,5 +1,4 @@
 # Evolutionary Robotics - Autonomous Maze Navigation
-**Student Number (Problem ID / Seed): 821836**
 
 ## Hyperparameter Tuning
 I have created hyperparameter tuning files for each controller since they have different structures.
